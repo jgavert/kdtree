@@ -5,10 +5,14 @@
 class KDTree
 {
 public:
-  KDTree();
+  KDTree(int k, float* input);
   ~KDTree();
+  void findNearestNeighbour();
 
 private:
+  int dim;
+  void addPoint(tnode* node);
+  tnode* head;
 };
 
 #endif
