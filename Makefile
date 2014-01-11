@@ -30,10 +30,10 @@ prof: CXXFLAGS += -pg
 prof: LIBS += -pg
 prof: all
 
-SRC_PROGRAM := $(foreach dir, $(PROGRAM_DIRS), $(wildcard $(dir)/*.cc))
+SRC_PROGRAM := $(foreach dir, $(PROGRAM_DIRS), $(wildcard $(dir)/*.cpp))
 ASMSRC_PROGRAM := $(foreach dir, $(PROGRAM_DIRS), $(wildcard $(dir)/*.asm))
 
-OBJ_PROGRAM := $(patsubst $(SRC)/%.cc, $(OBJ)/%.o, $(SRC_PROGRAM))
+OBJ_PROGRAM := $(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(SRC_PROGRAM))
 ASMOBJ_PROGRAM := $(patsubst $(SRC)/%.asm, $(OBJ)/%.o, $(ASMSRC_PROGRAM))
 
 DEPFILES := $(OBJ_PROGRAM:.o=.d)
@@ -49,7 +49,7 @@ $(BIN)/%:
 	@echo LINK $@
 	@$(CXX) $^ $(LIBS) -o $@
 
-$(OBJ)/%.o: $(SRC)/%.cc
+$(OBJ)/%.o: $(SRC)/%.cpp
 	@echo CXX $@
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 	@$(CXX) $(CXXFLAGS) -MM -MT "$(@:.d=.o) $@" $< > $(@:.o=.d)

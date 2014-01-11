@@ -4,7 +4,6 @@
 struct tnode
 {
   float* data;
-  tnode* parent;
   tnode* leftL;
   tnode* rightL;
 };
