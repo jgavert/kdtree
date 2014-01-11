@@ -5,7 +5,7 @@
 class KDTree
 {
 public:
-  KDTree(int k, float* input);
+  KDTree(int k, float* input, int size);
   ~KDTree();
   void findNearestNeighbour();
 
