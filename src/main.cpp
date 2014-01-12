@@ -12,7 +12,7 @@ int main()
                      0.8f, 1.0f, 0.0f};
   KDTree tree(3, dataa, 18);
   float find[3] = {0.5f,0.5f,0.5f};
-  float* result = tree.NN(&find);
+  float* result = tree.NN(find);
   for (int i=0;i<3;i++) {
     std::cout << result[i] << " ";
   }
