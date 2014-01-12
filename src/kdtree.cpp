@@ -101,6 +101,7 @@ float* KDTree::NN(float* s_data)
           tmp = tmp->rightL;
       }
       //now we are in the right branch, gogo
+      //This FAILS, since we cannot know if we already did this same thing.
       if (tmp != nullptr) {
         level++;
         while(true) {
@@ -133,6 +134,54 @@ float* KDTree::NN(float* s_data)
   // and current node is less than the distance (overall coordinates) from the
   // search point to the current best
   return currentBest->data;
+}
+
+float* KDTree::rNN(float* s_data)
+{
+  tnode* curBest = nullptr;
+  curBest = recNN(s_data, head, 0);
+  return curBest->data;
+}
+
+tnode* KDTree::recNN(float* s_data, tnode* tmp, int level)
+{
+  if (level == dim)
+    level = 0;
+  tnode* newbest;
+  if (tmp->data[level] < s_data[level]) // "new data" is bigger
+  {
+    if (tmp->rightL != nullptr)
+      newbest = recNN(s_data, tmp->rightL, level++);
+    else
+      return tmp;
+  } else {
+    if (tmp->leftL != nullptr)
+      newbest = recNN(s_data, tmp->leftL, level++);
+    else
+      return tmp;
+  }
+  float distToBest = distS(newbest, s_data);
+  float distToTmp = distS(tmp, s_data);
+  if (distToTmp < distToBest) {
+    newbest = tmp;
+    distToBest = distToTmp;
+  }
+  // the "big if", checks if there could be better on the other side of the axis
+  if (distToBest > (tmp->data[level] - s_data[level]) * (tmp->data[level] - s_data[level])) {
+    if (tmp->data[level] < s_data[level])
+    {
+      if (tmp->leftL != nullptr) // so we go to the opposite
+        tmp = tmp->leftL;
+    } else {
+      if (tmp->rightL != nullptr) // because the "big if" told us to do so
+        tmp = tmp->rightL;
+    }
+    tnode* another = recNN(s_data, tmp, level++); // we go to the other branch
+    if (distS(another, s_data) < distToBest)
+      newbest = another;
+  }
+
+  return newbest;
 }
 
 // private
