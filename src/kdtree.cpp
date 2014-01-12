@@ -48,7 +48,7 @@ float KDTree::distS(tnode* n1, float* data)
   return sum;
 }
 
-void KDTree::findNearestNeighbour(float* s_data)
+float* KDTree::NN(float* s_data)
 {
   tnode* currentBest = head;
   tnode* tmp = head;
@@ -75,17 +75,19 @@ void KDTree::findNearestNeighbour(float* s_data)
     }
     level++;
   }
-  currentBest = history.pop_back(); // pop the leaf node
+  currentBest = history.back(); // pop the leaf node
+  history.pop_back();
   float distToBest = distS(currentBest, s_data);
   level--; //since we start from before leaf node
   while(history.size() != 0) {
-    tmp = history.pop_back();
+    tmp = history.back();
+    history.pop_back();
     float distToTmp = distS(tmp, s_data);
     if (distToTmp < distToBest) {
       currentBest = tmp;
       distToBest = distToTmp;
     }
-    if (distToBest > (tmp->data[level] - s_data[level]) * (tmp->data[level] - s_data[level]) {
+    if (distToBest > (tmp->data[level] - s_data[level]) * (tmp->data[level] - s_data[level])) {
       // compare the current best distance to distance to current hyperplane
       // or the you understand the above check. durr it's easy but hard to say the term
       // so, basically go to the another branch till end
@@ -130,6 +132,7 @@ void KDTree::findNearestNeighbour(float* s_data)
   // check if difference between the splitting coordinate of the search point
   // and current node is less than the distance (overall coordinates) from the
   // search point to the current best
+  return currentBest->data;
 }
 
 // private
