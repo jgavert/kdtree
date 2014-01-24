@@ -136,6 +136,14 @@ float* KDTree::NN(float* s_data)
   return currentBest->data;
 }
 
+void KDTree::pn(tnode* node)
+{
+  for (int i=0;i<dim;i++) {
+    std::cout << node->data[i] << " ";
+  }
+  std::cout << std::endl;
+}
+
 float* KDTree::rNN(float* s_data)
 {
   tnode* curBest = nullptr;
@@ -147,25 +155,25 @@ tnode* KDTree::recNN(float* s_data, tnode* tmp, int level)
 {
   if (level == dim)
     level = 0;
-  tnode* newbest;
+  tnode* newbest = nullptr;
   if (tmp->data[level] < s_data[level]) // "new data" is bigger
   {
     if (tmp->rightL != nullptr)
       newbest = recNN(s_data, tmp->rightL, level++);
-    else
-      return tmp;
   } else {
     if (tmp->leftL != nullptr)
       newbest = recNN(s_data, tmp->leftL, level++);
-    else
-      return tmp;
   }
+  if (newbest == nullptr)
+    newbest = tmp;
+
   float distToBest = distS(newbest, s_data);
   float distToTmp = distS(tmp, s_data);
   if (distToTmp < distToBest) {
     newbest = tmp;
     distToBest = distToTmp;
   }
+  pn(newbest);
   // the "big if", checks if there could be better on the other side of the axis
   if (distToBest > (tmp->data[level] - s_data[level]) * (tmp->data[level] - s_data[level])) {
     if (tmp->data[level] < s_data[level])
