@@ -4,15 +4,23 @@
 
 int main()
 {
-  float dataa[12] = {0.0f, 0.0f,
-                     0.2f, 1.0f,
-                     0.3f, 0.4f,
-                     0.5f, 0.1f,
-                     0.4f, 0.2f,
-                     0.8f, 1.0f};
+  float dataa[12] = {0.5f, 0.0f,
+                     0.1f, 0.1f,
+                     0.9f, 0.1f,
+                     0.2f, 0.2f,
+                     0.8f, 0.8f,
+                     0.7f, 0.51f};
   KDTree tree(2, dataa, 12);
-  float find[2] = {0.21f,0.95f};
-  float* result = tree.rNN(find);
+  tree.print();
+
+  float find[2] = {0.49f,0.8f};
+  float* result = tree.NN(find);
+  std::cout << "searching nearestneighbour for ";
+  for (int i=0;i<2;i++) {
+    std::cout << find[i] << " ";
+  }
+  std::cout << std::endl;
+  std::cout << "Got result: ";
   for (int i=0;i<2;i++) {
     std::cout << result[i] << " ";
   }

@@ -10,10 +10,11 @@ public:
   KDTree(int k, float* input, int size);
   ~KDTree();
   float* NN(float* s_data);
-  float* rNN(float* s_data);
+  void print();
 
 private:
   tnode* recNN(float*, tnode*, int);
+  void printlevel(std::deque<tnode*> nodes);
   int dim;
   void pn(tnode* node);
   void addPoint(tnode* node);

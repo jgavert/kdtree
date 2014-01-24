@@ -8,17 +8,17 @@ KDTree::KDTree(int k, float* input, int size) {
   head->leftL = nullptr;
   head->rightL = nullptr;
   for (int i=0; i<k;i++) {
-    head->data[index] = input[index];
+    head->data[i] = input[index];
     index++;
   }
-  for (int i=1;i<size;i++) {
+  for (int i=1;i<size/k;i++) {
     //make new node
     tnode* node = new tnode;
     node->data = new float[k];
     node->leftL = nullptr;
     node->rightL = nullptr;
     for (int j=0;j<k;j++) {
-      node->data[index] = input[index];
+      node->data[j] = input[index];
       index++;
     }
     addPoint(node);
@@ -48,103 +48,52 @@ float KDTree::distS(tnode* n1, float* data)
   return sum;
 }
 
-float* KDTree::NN(float* s_data)
-{
-  tnode* currentBest = head;
-  tnode* tmp = head;
-  int level = 0;
-  std::deque<tnode*> history;
-  while(true) {
-    history.push_back(tmp); // adding every node to be compared
-    if (level == dim) {
-      level = 0;
-    }
-    if (tmp->data[level] < s_data[level]) // "new data" is bigger
-    {
-      if (tmp->rightL != nullptr)
-        tmp = tmp->rightL;
-      else {
-        break;
-      }
-    } else {
-      if (tmp->leftL != nullptr)
-        tmp = tmp->leftL;
-      else {
-        break;
-      }
-    }
-    level++;
-  }
-  currentBest = history.back(); // pop the leaf node
-  history.pop_back();
-  float distToBest = distS(currentBest, s_data);
-  level--; //since we start from before leaf node
-  while(history.size() != 0) {
-    tmp = history.back();
-    history.pop_back();
-    float distToTmp = distS(tmp, s_data);
-    if (distToTmp < distToBest) {
-      currentBest = tmp;
-      distToBest = distToTmp;
-    }
-    if (distToBest > (tmp->data[level] - s_data[level]) * (tmp->data[level] - s_data[level])) {
-      // compare the current best distance to distance to current hyperplane
-      // or the you understand the above check. durr it's easy but hard to say the term
-      // so, basically go to the another branch till end
-      // opposite than where we came from... if we can
-      if (tmp->data[level] < s_data[level]) // "new data" is bigger
-      {
-        if (tmp->leftL != nullptr)
-          tmp = tmp->leftL;
-      } else {
-        if (tmp->rightL != nullptr)
-          tmp = tmp->rightL;
-      }
-      //now we are in the right branch, gogo
-      //This FAILS, since we cannot know if we already did this same thing.
-      if (tmp != nullptr) {
-        level++;
-        while(true) {
-          history.push_back(tmp); // adding every node to be compared
-          if (level == dim) {
-            level = 0;
-          }
-          if (tmp->data[level] < s_data[level]) // "new data" is bigger
-          {
-            if (tmp->rightL != nullptr)
-              tmp = tmp->rightL;
-            else {
-              break;
-            }
-          } else {
-            if (tmp->leftL != nullptr)
-              tmp = tmp->leftL;
-            else {
-              break;
-            }
-          }
-          level++;
-        }
-      }
-    }
-    level--;
-  }
-  // first go to leaf and save that as currentBest, then go backwards and
-  // check if difference between the splitting coordinate of the search point
-  // and current node is less than the distance (overall coordinates) from the
-  // search point to the current best
-  return currentBest->data;
-}
 
 void KDTree::pn(tnode* node)
 {
-  for (int i=0;i<dim;i++) {
+  for (int i=0;i<dim-1;i++) {
     std::cout << node->data[i] << " ";
   }
-  std::cout << std::endl;
+  std::cout << node->data[dim-1];
 }
 
-float* KDTree::rNN(float* s_data)
+
+void KDTree::print()
+{
+  std::deque<tnode*> nodes;
+  nodes.push_back(head);
+  printlevel(nodes);
+}
+
+void KDTree::printlevel(std::deque<tnode*> nodes)
+{
+  bool hadreal = false;
+  std::deque<tnode*> next;
+  while(nodes.size() > 0) {
+    tnode* tmp = nodes.front();
+    nodes.pop_front();
+    if (tmp != nullptr) {
+      if (tmp->leftL != nullptr || tmp->rightL != nullptr)
+        hadreal = true;
+
+      next.push_back(tmp->leftL);
+      next.push_back(tmp->rightL);
+      std::cout << "[";
+      pn(tmp);
+      std::cout << "] ";
+    } else { // print the nullptr
+      std::cout << "[-] ";
+      next.push_back(nullptr);
+      next.push_back(nullptr);
+    }
+  }
+  std::cout << std::endl;
+  if (hadreal) {
+    printlevel(next);
+  }
+}
+
+float* KDTree::NN(float* s_data)
 {
   tnode* curBest = nullptr;
   curBest = recNN(s_data, head, 0);
@@ -153,16 +102,18 @@ float* KDTree::rNN(float* s_data)
 
 tnode* KDTree::recNN(float* s_data, tnode* tmp, int level)
 {
+  //pn(tmp);
+  //std::cout << std::endl;
   if (level == dim)
     level = 0;
   tnode* newbest = nullptr;
   if (tmp->data[level] < s_data[level]) // "new data" is bigger
   {
     if (tmp->rightL != nullptr)
-      newbest = recNN(s_data, tmp->rightL, level++);
+      newbest = recNN(s_data, tmp->rightL, level+1);
   } else {
     if (tmp->leftL != nullptr)
-      newbest = recNN(s_data, tmp->leftL, level++);
+      newbest = recNN(s_data, tmp->leftL, level+1);
   }
   if (newbest == nullptr)
     newbest = tmp;
@@ -172,21 +123,38 @@ tnode* KDTree::recNN(float* s_data, tnode* tmp, int level)
   if (distToTmp < distToBest) {
     newbest = tmp;
     distToBest = distToTmp;
+    //std::cout << "New Best!\n";
   }
+  /*
+  std::cout << "I am: ";
+  pn(tmp);
+  std::cout << " And current best: ";
   pn(newbest);
+  std::cout << std::endl;
+*/
   // the "big if", checks if there could be better on the other side of the axis
   if (distToBest > (tmp->data[level] - s_data[level]) * (tmp->data[level] - s_data[level])) {
+    //std::cout << "I want to go to another side." << std::endl;
+    bool asd = false;
+
     if (tmp->data[level] < s_data[level])
     {
-      if (tmp->leftL != nullptr) // so we go to the opposite
+      if (tmp->leftL != nullptr) { // so we go to the opposite
         tmp = tmp->leftL;
+        asd = true;
+      }
     } else {
-      if (tmp->rightL != nullptr) // because the "big if" told us to do so
+      if (tmp->rightL != nullptr) {// because the "big if" told us to do so
         tmp = tmp->rightL;
+        asd = true;
+      }
     }
-    tnode* another = recNN(s_data, tmp, level++); // we go to the other branch
-    if (distS(another, s_data) < distToBest)
-      newbest = another;
+    if (asd)
+    {
+      tnode* another = recNN(s_data, tmp, level++); // we go to the other branch
+      if (distS(another, s_data) < distToBest)
+        newbest = another;
+    }
   }
 
   return newbest;
