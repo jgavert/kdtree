@@ -1,2 +1,5 @@
 bin
 obj
+*.tlog
+*.idb
+win/kdtree.sdf

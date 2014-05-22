@@ -1,23 +1,23 @@
 #include "kdtree.hpp"
 
 KDTree::KDTree(int k, float* input, int size) {
-  int index=0;
+  int index = 0;
   dim = k;
   head = new tnode;
   head->data = new float[k];
   head->leftL = nullptr;
   head->rightL = nullptr;
-  for (int i=0; i<k;i++) {
+  for (int i=0; i < k; i++) {
     head->data[i] = input[index];
     index++;
   }
-  for (int i=1;i<size/k;i++) {
+  for (int i = 1; i < size/k; i++) {
     //make new node
     tnode* node = new tnode;
     node->data = new float[k];
     node->leftL = nullptr;
     node->rightL = nullptr;
-    for (int j=0;j<k;j++) {
+    for (int j = 0; j < k; j++) {
       node->data[j] = input[index];
       index++;
     }
@@ -33,7 +33,7 @@ KDTree::~KDTree() {
 float KDTree::dist(tnode* n1, tnode* n2)
 {
   float sum = 0.f;
-  for (int i=0;i<dim;i++) {
+  for (int i = 0; i < dim; i++) {
     sum += (n1->data[i] - n2->data[i]) * (n1->data[i] - n2->data[i]);
   }
   return sum;
@@ -42,7 +42,7 @@ float KDTree::dist(tnode* n1, tnode* n2)
 float KDTree::distS(tnode* n1, float* data)
 {
   float sum = 0.f;
-  for (int i=0;i<dim;i++) {
+  for (int i = 0; i < dim; i++) {
     sum += (n1->data[i] - data[i]) * (n1->data[i] - data[i]);
   }
   return sum;
@@ -51,7 +51,7 @@ float KDTree::distS(tnode* n1, float* data)
 
 void KDTree::pn(tnode* node)
 {
-  for (int i=0;i<dim-1;i++) {
+  for (int i = 0; i < dim-1; i++) {
     std::cout << node->data[i] << " ";
   }
   std::cout << node->data[dim-1];

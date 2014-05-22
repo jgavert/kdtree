@@ -1,8 +1,7 @@
-
-#include "kdtree.hpp"
 #include <iostream>
+#include "kdtree.hpp"
 
-int main()
+int main(int argc, char** argv)
 {
   float dataa[12] = {0.5f, 0.0f,
                      0.1f, 0.1f,
@@ -25,6 +24,8 @@ int main()
     std::cout << result[i] << " ";
   }
   std::cout << std::endl;
-
+#if WIN32
+  std::cin.get();
+#endif
   return 1;
 }
