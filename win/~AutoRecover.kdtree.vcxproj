@@ -72,13 +72,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\bvh.cpp" />
     <ClCompile Include="..\src\kdtree.cpp" />
+    <ClCompile Include="..\src\kdtreeRAII.cpp" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\bvh.hpp" />
     <ClInclude Include="..\src\kdtree.hpp" />
+    <ClInclude Include="..\src\kdtreeRAII.hpp" />
     <ClInclude Include="..\src\node.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
